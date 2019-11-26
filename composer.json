@@ -1,0 +1,21 @@
+{
+  "name": "vovan-ve/maze-project-php",
+  "description": "The Maze Project implementation in PHP",
+  "type": "project",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Vovan-VE",
+      "email": "vovan-ve@yandex.ru"
+    }
+  ],
+  "minimum-stability": "stable",
+  "autoload": {
+    "psr-4": {
+      "VovanVE\\MazeProject\\": "src/"
+    }
+  },
+  "require": {
+    "php": "^7.2"
+  }
+}
