@@ -32,12 +32,19 @@ class Options
 
     /**
      * Whether an option was set
-     * @param string $name
+     * @param string ...$name
      * @return bool
      */
-    public function hasOpt(string $name): bool
+    public function hasOpt(string ...$name): bool
     {
-        return isset($this->opt[$name]) || array_key_exists($name, $this->opt);
+        foreach ($name as $opt) {
+            // minimal PHP 7.2 allow us to drop outdated optimization
+            // `isset($a[$k]) || array_key_exists($k, $a)`
+            if (array_key_exists($opt, $this->opt)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

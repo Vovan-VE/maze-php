@@ -2,19 +2,33 @@
 
 namespace VovanVE\MazeProject\commands;
 
-class HelpCommand extends BaseCommand implements CommandInterface
+use VovanVE\MazeProject\cli\Console;
+use VovanVE\MazeProject\cli\getopt\OptionsParser;
+
+class HelpCommand extends BaseCommand
 {
     public function run(array $args): int
     {
-        if (!$args) {
+        $opts = (new OptionsParser('h::', ['help']))->parse($args);
+
+        if ($opts->hasOpt('h') && '' !== $opts->getOpt('h')) {
+            Console::stderr(
+                'W! key `-h` used with a value - did you mean ',
+                '`-H` (`--height`) from `gen` command?',
+                PHP_EOL
+            );
+        }
+
+        $values = $opts->getMixedValues();
+        if (!$values) {
             echo $this->getUsageHelp();
             return 0;
         }
 
-        [$commandName] = $args;
+        [$commandName] = $values;
         $command = $this->app->getCommand($commandName);
         if (!$command) {
-            echo "E! Unrecognized help topic: `$commandName`", PHP_EOL;
+            Console::stderr("E! Unknown command `$commandName`", PHP_EOL);
             return 1;
         }
 

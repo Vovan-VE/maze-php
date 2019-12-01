@@ -24,6 +24,11 @@ class OptionsTest extends BaseTestCase
         $this->assertTrue($opt->hasOpt('option'));
         $this->assertFalse($opt->hasOpt('omitted'));
 
+        $this->assertTrue($opt->hasOpt('switch', 'option'));
+        $this->assertTrue($opt->hasOpt('switch', 'omitted'));
+        $this->assertTrue($opt->hasOpt('option', 'omitted'));
+        $this->assertFalse($opt->hasOpt('omitted', 'unknown'));
+
         $this->assertEquals(null, $opt->getOpt('switch'));
         $this->assertEquals(null, $opt->getOpt('switch', 42));
         $this->assertEquals('value', $opt->getOpt('option'));
