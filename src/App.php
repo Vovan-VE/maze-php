@@ -48,6 +48,31 @@ class App
         return $class::create($this, $name);
     }
 
+    /**
+     * Get all commands
+     *
+     * ```
+     * [
+     *     'name' => [CommandInterface $command, bool $isDefault],
+     *     ...
+     * ]
+     * ```
+     * @return array
+     */
+    public function getAllCommands(): array
+    {
+        $result = [];
+        foreach (self::COMMANDS as $name => $class) {
+            /** @var BaseCommand|string $class */
+            $result[$name] = [
+                $class::create($this, $name),
+                $name === self::DEFAULT_COMMAND
+            ];
+        }
+        ksort($result);
+        return $result;
+    }
+
     protected function resolveCommand(array $args): array
     {
         if ($args) {

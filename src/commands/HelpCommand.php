@@ -9,7 +9,7 @@ class HelpCommand extends BaseCommand
 {
     public function run(array $args): int
     {
-        $opts = (new OptionsParser('h::', ['help']))
+        $opts = (new OptionsParser('h::l', ['help', 'list']))
             ->setBypassUnknown(true)
             ->parse($args);
 
@@ -21,20 +21,48 @@ class HelpCommand extends BaseCommand
             );
         }
 
-        $values = $opts->getMixedValues();
-        if (!$values) {
-            echo $this->getUsageHelp();
+        if ($opts->hasOpt('l', 'list')) {
+            echo <<<'_END'
+maze [command] [options]
+
+Available commands:
+
+_END;
+
+            foreach (
+                $this->app->getAllCommands()
+                as $name => [$command, $isDefault]
+            ) {
+                echo '  ', $name;
+                if ($isDefault) {
+                    echo '       default command';
+                }
+                echo PHP_EOL;
+            }
+
+            echo <<<'_END'
+
+Run `maze help [command]` to see help about specific command.
+
+_END;
             return 0;
         }
 
-        [$commandName] = $values;
-        $command = $this->app->getCommand($commandName);
-        if ($command) {
-            echo $command->getUsageHelp();
-        } else {
-            Console::stderr("E! Unknown help topic `$commandName`", PHP_EOL);
-            echo $this->getUsageHelp();
+        $values = $opts->getMixedValues();
+        if ($values) {
+            [$commandName] = $values;
+            $command = $this->app->getCommand($commandName);
+            if ($command) {
+                echo $command->getUsageHelp();
+                return 0;
+            }
+            Console::stderr(
+                "E! Unknown help topic `$commandName`",
+                PHP_EOL
+            );
         }
+
+        $this->showAppUsage();
 
         return 0;
     }
@@ -42,10 +70,31 @@ class HelpCommand extends BaseCommand
     public function getUsageHelp(): string
     {
         return <<<'_END'
-maze help [command]
-maze (-h | --help) [command]
+maze help [options] [command]
+maze (-h | --help) [options] [command]
 
 Show help either about specified `command` or common usage help.
+
+Options:
+
+    -l, --list
+        List all available commands.
+
+_END;
+    }
+
+    protected function showAppUsage(): void
+    {
+        echo <<<'_END'
+maze [command] [options]
+
+Run `maze help -l` to see available commands.
+
+Run `maze help [command]` to see help about specific command.
+
+The default command in `gen`. Run `maze help gen` too see help for generation.
+
+TBW: ...
 
 _END;
     }
