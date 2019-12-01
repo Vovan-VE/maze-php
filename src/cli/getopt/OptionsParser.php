@@ -14,6 +14,9 @@ class OptionsParser
     private $short = [];
     private $long = [];
 
+    /** @var bool Whether to bypass unknown options as plain values */
+    private $bypassUnknown = false;
+
     private const BAD_SHORT_KEYS = '-:';
 
     /**
@@ -80,6 +83,11 @@ class OptionsParser
                 }
 
                 if (!isset($this->long[$name])) {
+                    if ($this->getBypassUnknown()) {
+                        $plainValues[] = $arg;
+                        continue;
+                    }
+
                     throw new \InvalidArgumentException(
                         "unrecognized option: `--$name`"
                     );
@@ -111,6 +119,12 @@ class OptionsParser
                 // -a...
                 $name = $arg[1];
                 if (!isset($this->short[$name])) {
+                    if ($this->getBypassUnknown()) {
+                        $plainValues[] = $arg;
+                        $i++;
+                        continue;
+                    }
+
                     throw new \InvalidArgumentException(
                         "unrecognized key: `-$name`"
                     );
@@ -248,5 +262,25 @@ class OptionsParser
     final public function getLong(): array
     {
         return $this->long;
+    }
+
+    /**
+     * Whether to bypass unknown options as plain values
+     * @return bool
+     */
+    final public function getBypassUnknown(): bool
+    {
+        return $this->bypassUnknown;
+    }
+
+    /**
+     * Whether to bypass unknown options as plain values
+     * @param bool $bypassUnknown
+     * @return $this
+     */
+    public function setBypassUnknown(bool $bypassUnknown): self
+    {
+        $this->bypassUnknown = $bypassUnknown;
+        return $this;
     }
 }

@@ -64,8 +64,9 @@ class App
             }
 
             // edge case: -h[value] or --help
-            // TODO: don't throw on unknown options
-            $opts = (new OptionsParser('h::', ['help']))->parse($args);
+            $opts = (new OptionsParser('h::', ['help']))
+                ->setBypassUnknown(true)
+                ->parse($args);
             if ($opts->hasOpt('h', 'help')) {
                 return [
                     $this->getCommand('help'),

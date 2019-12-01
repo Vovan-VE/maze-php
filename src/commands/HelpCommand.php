@@ -9,7 +9,9 @@ class HelpCommand extends BaseCommand
 {
     public function run(array $args): int
     {
-        $opts = (new OptionsParser('h::', ['help']))->parse($args);
+        $opts = (new OptionsParser('h::', ['help']))
+            ->setBypassUnknown(true)
+            ->parse($args);
 
         if ($opts->hasOpt('h') && '' !== $opts->getOpt('h')) {
             Console::stderr(
@@ -27,12 +29,13 @@ class HelpCommand extends BaseCommand
 
         [$commandName] = $values;
         $command = $this->app->getCommand($commandName);
-        if (!$command) {
-            Console::stderr("E! Unknown command `$commandName`", PHP_EOL);
-            return 1;
+        if ($command) {
+            echo $command->getUsageHelp();
+        } else {
+            Console::stderr("E! Unknown help topic `$commandName`", PHP_EOL);
+            echo $this->getUsageHelp();
         }
 
-        echo $command->getUsageHelp();
         return 0;
     }
 
@@ -40,6 +43,7 @@ class HelpCommand extends BaseCommand
     {
         return <<<'_END'
 maze help [command]
+maze (-h | --help) [command]
 
 Show help either about specified `command` or common usage help.
 

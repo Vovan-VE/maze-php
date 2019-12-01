@@ -447,4 +447,90 @@ class OptionsParserTest extends BaseTestCase
             ],
         ];
     }
+
+    public function testBypassUnknown()
+    {
+        $getopt = new OptionsParser('h', ['help']);
+        $this->assertFalse($getopt->getBypassUnknown());
+        $this->assertSame($getopt, $getopt->setBypassUnknown(false));
+        $this->assertSame($getopt, $getopt->setBypassUnknown(true));
+        $this->assertTrue($getopt->getBypassUnknown());
+    }
+
+    /**
+     * @param array $input
+     * @param Options $result
+     * @dataProvider dataParseBypassUnknown
+     */
+    public function testParseBypassUnknown(array $input, Options $result)
+    {
+        $getopt = (new OptionsParser('h', ['help']))
+            ->setBypassUnknown(true);
+
+        $this->assertEquals($result, $getopt->parse($input));
+    }
+
+    public function dataParseBypassUnknown()
+    {
+        return [
+            [
+                ['-x', 'foo', '--what', 'bar', '--', 'bar', '-h', 'lol'],
+                new Options(
+                    [],
+                    ['-x', 'foo', '--what', 'bar'],
+                    ['bar', '-h', 'lol']
+                ),
+            ],
+
+            [
+                ['-h', '-x', 'foo', '--what', 'bar', '--', 'bar', '-h', 'lol'],
+                new Options(
+                    ['h' => true],
+                    ['-x', 'foo', '--what', 'bar'],
+                    ['bar', '-h', 'lol']
+                ),
+            ],
+            [
+                ['-x', '-h', 'foo', '--what', 'bar', '--', 'bar', '-h', 'lol'],
+                new Options(
+                    ['h' => true],
+                    ['-x', 'foo', '--what', 'bar'],
+                    ['bar', '-h', 'lol']
+                ),
+            ],
+            [
+                ['-x', 'foo', '--what', 'bar', '-h', '--', 'bar', '-h', 'lol'],
+                new Options(
+                    ['h' => true],
+                    ['-x', 'foo', '--what', 'bar'],
+                    ['bar', '-h', 'lol']
+                ),
+            ],
+
+            [
+                ['--help', '--foo', 'foo', '-x', 'bar', '--', 'bar', '-h'],
+                new Options(
+                    ['help' => true],
+                    ['--foo', 'foo', '-x', 'bar'],
+                    ['bar', '-h']
+                ),
+            ],
+            [
+                ['--foo', 'foo', '--help', '-x', 'bar', '--', 'bar', '-h'],
+                new Options(
+                    ['help' => true],
+                    ['--foo', 'foo', '-x', 'bar'],
+                    ['bar', '-h']
+                ),
+            ],
+            [
+                ['--foo', 'foo', '-x', 'bar', '--help', '--', 'bar', '-h'],
+                new Options(
+                    ['help' => true],
+                    ['--foo', 'foo', '-x', 'bar'],
+                    ['bar', '-h']
+                ),
+            ],
+        ];
+    }
 }
