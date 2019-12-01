@@ -2,6 +2,8 @@
 
 namespace VovanVE\MazeProject;
 
+use VovanVE\MazeProject\cli\Console;
+use VovanVE\MazeProject\cli\getopt\InvalidOptionException;
 use VovanVE\MazeProject\cli\getopt\OptionsParser;
 use VovanVE\MazeProject\commands\BaseCommand;
 use VovanVE\MazeProject\commands\CommandInterface;
@@ -34,7 +36,13 @@ class App
 
     public function run(): int
     {
-        return $this->command->run($this->args);
+        try {
+            return $this->command->run($this->args);
+        } catch (InvalidOptionException $e) {
+            Console::stderr('maze: ', $e->getMessage(), PHP_EOL);
+            Console::stderr("Run `maze help {$this->command->getName()}`", PHP_EOL);
+            return 2;
+        }
     }
 
     public function getCommand(string $name): ?CommandInterface

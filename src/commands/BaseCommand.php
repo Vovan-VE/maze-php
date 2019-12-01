@@ -21,4 +21,12 @@ abstract class BaseCommand implements CommandInterface
     {
         return new static($app, $name);
     }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
 }

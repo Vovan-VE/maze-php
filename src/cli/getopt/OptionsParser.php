@@ -88,7 +88,7 @@ class OptionsParser
                         continue;
                     }
 
-                    throw new \InvalidArgumentException(
+                    throw new InvalidOptionException(
                         "unrecognized option: `--$name`"
                     );
                 }
@@ -97,7 +97,7 @@ class OptionsParser
 
                 if ($type === self::V_NO) {
                     if ($value !== true) {
-                        throw new \InvalidArgumentException(
+                        throw new InvalidOptionException(
                             "option `--$name` cannot be used with value"
                         );
                     }
@@ -105,7 +105,7 @@ class OptionsParser
                     if ($value === true) {
                         // --a
                         if ($i === $count) {
-                            throw new \InvalidArgumentException(
+                            throw new InvalidOptionException(
                                 "option `--$name` must be used with value"
                             );
                         }
@@ -125,7 +125,7 @@ class OptionsParser
                         continue;
                     }
 
-                    throw new \InvalidArgumentException(
+                    throw new InvalidOptionException(
                         "unrecognized key: `-$name`"
                     );
                 }
@@ -159,7 +159,7 @@ class OptionsParser
                     } else {
                         // -a
                         if ($i === $count) {
-                            throw new \InvalidArgumentException(
+                            throw new InvalidOptionException(
                                 "key `-$name` must be used with value"
                             );
                         }

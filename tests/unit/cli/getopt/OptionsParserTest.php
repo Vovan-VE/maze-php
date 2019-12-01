@@ -4,6 +4,7 @@ namespace VovanVE\MazeProject\tests\unit\cli\getopt;
 
 use VovanVE\MazeProject\cli\getopt\Options;
 use VovanVE\MazeProject\cli\getopt\OptionsParser;
+use VovanVE\MazeProject\cli\getopt\InvalidOptionException;
 use VovanVE\MazeProject\tests\helpers\BaseTestCase;
 
 class OptionsParserTest extends BaseTestCase
@@ -399,7 +400,7 @@ class OptionsParserTest extends BaseTestCase
     ) {
         $getopt = new OptionsParser($short, $long);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidOptionException::class);
         $this->expectExceptionMessage($error);
 
         $getopt->parse($input);
