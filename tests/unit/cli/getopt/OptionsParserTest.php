@@ -10,176 +10,73 @@ use VovanVE\MazeProject\tests\helpers\BaseTestCase;
 class OptionsParserTest extends BaseTestCase
 {
     /**
-     * @param string $input
-     * @param array $output
-     * @dataProvider dataExpandShortDefinition
-     */
-    public function testExpandShortDefinition(string $input, array $output)
-    {
-        $this->assertEquals(
-            \iterator_to_array(OptionsParser::expandShortDefinition($input)),
-            $output
-        );
-    }
-
-    public function dataExpandShortDefinition()
-    {
-        return [
-            [
-                '',
-                [],
-            ],
-            [
-                'a',
-                ['a'],
-            ],
-            [
-                'ab',
-                ['a', 'b'],
-            ],
-            [
-                'a:',
-                ['a:'],
-            ],
-            [
-                'a:b',
-                ['a:', 'b'],
-            ],
-            [
-                'a::',
-                ['a::'],
-            ],
-            [
-                'a::b',
-                ['a::', 'b'],
-            ],
-            [
-                'ab:',
-                ['a', 'b:'],
-            ],
-            [
-                'ab::',
-                ['a', 'b::'],
-            ],
-            [
-                'a:b:',
-                ['a:', 'b:'],
-            ],
-            [
-                'a::b:',
-                ['a::', 'b:'],
-            ],
-            [
-                'a:b::',
-                ['a:', 'b::'],
-            ],
-            [
-                'a::b::',
-                ['a::', 'b::'],
-            ],
-        ];
-    }
-
-    /**
-     * @param string $input
-     * @param string $message
-     * @dataProvider dataExpandShortDefinitionFail
-     */
-    public function testExpandShortDefinitionFail(
-        string $input,
-        string $message
-    ) {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage($message);
-
-        \iterator_to_array(OptionsParser::expandShortDefinition($input));
-    }
-
-    public function dataExpandShortDefinitionFail()
-    {
-        return [
-            [
-                '-',
-                "Bad key `-` at offset 0",
-            ],
-            [
-                ':',
-                "Bad key `:` at offset 0",
-            ],
-            [
-                'a:::',
-                "Bad key `:` at offset 3",
-            ],
-            [
-                'abc:::',
-                "Bad key `:` at offset 5",
-            ],
-        ];
-    }
-
-    /**
-     * @param string $short
      * @param array $long
      * @param string $error
      * @dataProvider dataCreateFail
      */
-    public function testCreateFail(string $short, array $long, string $error)
+    public function testCreateFail(array $long, string $error)
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($error);
 
-        new OptionsParser($short, $long);
+        new OptionsParser($long);
     }
 
     public function dataCreateFail()
     {
         return [
             [
-                'aba',
-                [],
+                ['a', '', 'b'],
+                "Bad option name ''",
+            ],
+            [
+                ['a', 'x||y', 'b'],
+                "Bad option name ''",
+            ],
+            [
+                ['a', '-', 'b'],
+                "Bad option name '-'",
+            ],
+            [
+                ['a', '-|b'],
+                "Bad option name '-'",
+            ],
+            [
+                ['a', 'b|-'],
+                "Bad option name '-'",
+            ],
+            [
+                ['a', 'b', 'a'],
                 "Duplicate option 'a'",
             ],
             [
-                'aba:',
-                [],
+                ['a', 'b', 'a:'],
                 "Duplicate option 'a'",
             ],
             [
-                'a:ba',
-                [],
+                ['a:', 'b', 'a'],
                 "Duplicate option 'a'",
             ],
             [
-                'aa::',
-                [],
+                ['a', 'a::'],
                 "Duplicate option 'a'",
             ],
 
             [
-                '',
                 ['foo', 'bar', 'foo'],
                 "Duplicate option 'foo'",
             ],
             [
-                '',
                 ['foo', 'bar', 'foo:'],
                 "Duplicate option 'foo'",
             ],
             [
-                '',
                 ['foo:', 'bar', 'foo'],
                 "Duplicate option 'foo'",
             ],
             [
-                '',
                 ['foo', 'bar', 'foo::'],
                 "Duplicate option 'foo'",
-            ],
-
-            [
-                'abc',
-                ['boo', 'a', 'foo', 'c'],
-                'Some options duplicated in short and long forms: "a", "c"',
             ],
         ];
     }
@@ -187,49 +84,67 @@ class OptionsParserTest extends BaseTestCase
     public function testCreate()
     {
         $o = new OptionsParser(
-            'abc:d:e::f::',
-            ['foo', 'bar', 'baz:', 'qwe:', 'lol::', 'sit::']
-        );
-
-        $this->assertEquals(
-            $o->getShort(),
             [
-                'a' => OptionsParser::V_NO,
-                'b' => OptionsParser::V_NO,
-                'c' => OptionsParser::V_REQUIRED,
-                'd' => OptionsParser::V_REQUIRED,
-                'e' => OptionsParser::V_OPTIONAL,
-                'f' => OptionsParser::V_OPTIONAL,
+                'a',
+                'foo',
+                'b|bar',
+                'c:',
+                'baz:',
+                'd|q|qwe:',
+                'e::',
+                'lol::',
+                'sit|f::'
             ]
         );
 
         $this->assertEquals(
-            $o->getLong(),
+            $o->getTypes(),
             [
+                'a' => OptionsParser::V_NO,
                 'foo' => OptionsParser::V_NO,
-                'bar' => OptionsParser::V_NO,
+                'b' => OptionsParser::V_NO,
+                'c' => OptionsParser::V_REQUIRED,
                 'baz' => OptionsParser::V_REQUIRED,
-                'qwe' => OptionsParser::V_REQUIRED,
+                'd' => OptionsParser::V_REQUIRED,
+                'e' => OptionsParser::V_OPTIONAL,
                 'lol' => OptionsParser::V_OPTIONAL,
                 'sit' => OptionsParser::V_OPTIONAL,
+            ]
+        );
+        $this->assertEquals(
+            $o->getShortAlias(),
+            [
+                'a' => 'a',
+                'b' => 'b',
+                'c' => 'c',
+                'd' => 'd',
+                'q' => 'd',
+                'e' => 'e',
+                'f' => 'sit',
+            ]
+        );
+        $this->assertEquals(
+            $o->getLongAlias(),
+            [
+                'foo' => 'foo',
+                'bar' => 'b',
+                'baz' => 'baz',
+                'qwe' => 'd',
+                'lol' => 'lol',
+                'sit' => 'sit',
             ]
         );
     }
 
     /**
-     * @param string $short
      * @param array $long
      * @param array $input
      * @param Options $result
      * @dataProvider dataParse
      */
-    public function testParse(
-        string $short,
-        array $long,
-        array $input,
-        Options $result
-    ) {
-        $getopt = new OptionsParser($short, $long);
+    public function testParse(array $long, array $input, Options $result)
+    {
+        $getopt = new OptionsParser($long);
         $this->assertEquals($result, $getopt->parse($input));
     }
 
@@ -237,15 +152,13 @@ class OptionsParserTest extends BaseTestCase
     {
         return [
             [
-                '',
                 [],
                 [],
                 new Options(),
             ],
 
             [
-                'abcde',
-                [],
+                ['a', 'b', 'c', 'd', 'e'],
                 ['-a', 'foo', '-b', '', '-cd', '-', 'bar'],
                 new Options(
                     [
@@ -258,8 +171,7 @@ class OptionsParserTest extends BaseTestCase
                 ),
             ],
             [
-                'a:b:c:de',
-                [],
+                ['a:', 'b:', 'c:', 'd', 'e'],
                 ['-a', 'foo', '-b', '', '-cde', '-de', '-', 'bar'],
                 new Options(
                     [
@@ -273,8 +185,7 @@ class OptionsParserTest extends BaseTestCase
                 ),
             ],
             [
-                'a::b::cd::e',
-                [],
+                ['a::', 'b::', 'c', 'd::', 'e'],
                 ['-a', 'foo', '-bcd', '', '-cd', '-', 'bar'],
                 new Options(
                     [
@@ -288,7 +199,6 @@ class OptionsParserTest extends BaseTestCase
             ],
 
             [
-                '',
                 ['foo', 'bar', 'lol', 'baz'],
                 ['--foo', 'a', '--bar', '', '--lol', '-', 'bar'],
                 new Options(
@@ -301,7 +211,6 @@ class OptionsParserTest extends BaseTestCase
                 ),
             ],
             [
-                '',
                 ['foo:', 'bar:', 'lol:', 'baz:'],
                 ['--foo', '-a', '--bar', '', '--lol', '-', 'qux'],
                 new Options(
@@ -314,7 +223,6 @@ class OptionsParserTest extends BaseTestCase
                 ),
             ],
             [
-                '',
                 ['foo:', 'bar:', 'lol:', 'baz:'],
                 ['--foo=', 'a', '--bar=hello', 'qux'],
                 new Options(
@@ -326,7 +234,6 @@ class OptionsParserTest extends BaseTestCase
                 ),
             ],
             [
-                '',
                 ['foo::', 'bar::', 'lol::', 'baz::'],
                 ['--foo', 'a', '--bar', '--lol', 'qux'],
                 new Options(
@@ -339,7 +246,6 @@ class OptionsParserTest extends BaseTestCase
                 ),
             ],
             [
-                '',
                 ['foo::', 'bar::', 'lol::', 'baz::'],
                 ['--foo=', 'a', '--bar=hello', 'qux'],
                 new Options(
@@ -352,29 +258,27 @@ class OptionsParserTest extends BaseTestCase
             ],
 
             [
-                'a:',
-                ['foo:'],
+                ['a|foo:', 'bar|b:'],
                 [
-                    '--foo=first',
+                    '--bar=first',
                     '-a10',
-                    '-a20',
-                    '--foo=second',
+                    '--foo=20',
+                    '-bsecond',
                     '--',
                     '-a=30',
-                    '--foo=third'
+                    '--bar=third'
                 ],
                 new Options(
                     [
                         'a' => '20',
-                        'foo' => 'second',
+                        'bar' => 'second',
                     ],
                     [],
-                    ['-a=30', '--foo=third']
+                    ['-a=30', '--bar=third']
                 ),
             ],
             [
-                'a',
-                ['foo'],
+                ['a', 'foo'],
                 ['foo', 'a', '--', '-a', '--foo', 'bar'],
                 new Options(
                     [],
@@ -386,19 +290,14 @@ class OptionsParserTest extends BaseTestCase
     }
 
     /**
-     * @param string $short
      * @param array $long
      * @param array $input
      * @param string $error
      * @dataProvider dataParseFail
      */
-    public function testParseFail(
-        string $short,
-        array $long,
-        array $input,
-        string $error
-    ) {
-        $getopt = new OptionsParser($short, $long);
+    public function testParseFail(array $long, array $input, string $error)
+    {
+        $getopt = new OptionsParser($long);
 
         $this->expectException(InvalidOptionException::class);
         $this->expectExceptionMessage($error);
@@ -410,38 +309,32 @@ class OptionsParserTest extends BaseTestCase
     {
         return [
             [
-                'ab',
-                [],
+                ['a', 'b'],
                 ['-a', '-ba', '-acb'],
                 'unrecognized key: `-c`',
             ],
             [
-                'a:b:c:d:',
-                [],
+                ['a:', 'b:', 'c:', 'd:'],
                 ['-a10', '-bcd', '-c', '20', '-d'],
                 'key `-d` must be used with value',
             ],
 
             [
-                '',
                 ['foo', 'bar'],
                 ['--foo', '--bar', '--lol', '--bar'],
                 'unrecognized option: `--lol`',
             ],
             [
-                '',
                 ['foo', 'bar'],
                 ['--foo', '--bar='],
                 'option `--bar` cannot be used with value',
             ],
             [
-                '',
                 ['foo', 'bar'],
                 ['--foo', '--bar=20', 'hello'],
                 'option `--bar` cannot be used with value',
             ],
             [
-                '',
                 ['foo:', 'bar:'],
                 ['--foo', 'hello', '--bar'],
                 'option `--bar` must be used with value',
@@ -451,7 +344,7 @@ class OptionsParserTest extends BaseTestCase
 
     public function testBypassUnknown()
     {
-        $getopt = new OptionsParser('h', ['help']);
+        $getopt = new OptionsParser(['h|help']);
         $this->assertFalse($getopt->getBypassUnknown());
         $this->assertSame($getopt, $getopt->setBypassUnknown(false));
         $this->assertSame($getopt, $getopt->setBypassUnknown(true));
@@ -465,7 +358,7 @@ class OptionsParserTest extends BaseTestCase
      */
     public function testParseBypassUnknown(array $input, Options $result)
     {
-        $getopt = (new OptionsParser('h', ['help']))
+        $getopt = (new OptionsParser(['h|help', 'HELP|H']))
             ->setBypassUnknown(true);
 
         $this->assertEquals($result, $getopt->parse($input));
@@ -509,27 +402,27 @@ class OptionsParserTest extends BaseTestCase
             ],
 
             [
-                ['--help', '--foo', 'foo', '-x', 'bar', '--', 'bar', '-h'],
+                ['--HELP', '--foo', 'foo', '-x', 'bar', '--', 'bar', '-H'],
                 new Options(
-                    ['help' => true],
+                    ['HELP' => true],
                     ['--foo', 'foo', '-x', 'bar'],
-                    ['bar', '-h']
+                    ['bar', '-H']
                 ),
             ],
             [
-                ['--foo', 'foo', '--help', '-x', 'bar', '--', 'bar', '-h'],
+                ['--foo', 'foo', '--HELP', '-x', 'bar', '--', 'bar', '-H'],
                 new Options(
-                    ['help' => true],
+                    ['HELP' => true],
                     ['--foo', 'foo', '-x', 'bar'],
-                    ['bar', '-h']
+                    ['bar', '-H']
                 ),
             ],
             [
-                ['--foo', 'foo', '-x', 'bar', '--help', '--', 'bar', '-h'],
+                ['--foo', 'foo', '-x', 'bar', '--HELP', '--', 'bar', '-H'],
                 new Options(
-                    ['help' => true],
+                    ['HELP' => true],
                     ['--foo', 'foo', '-x', 'bar'],
-                    ['bar', '-h']
+                    ['bar', '-H']
                 ),
             ],
         ];

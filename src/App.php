@@ -97,7 +97,7 @@ class App
             }
 
             // edge case: -h[value] or --help
-            $opts = (new OptionsParser('h::', ['help']))
+            $opts = (new OptionsParser(['h::', 'help']))
                 ->setBypassUnknown(true)
                 ->parse($args);
             if ($opts->hasOpt('h', 'help')) {

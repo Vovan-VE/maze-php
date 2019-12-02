@@ -9,7 +9,7 @@ class HelpCommand extends BaseCommand
 {
     public function run(array $args): int
     {
-        $opts = (new OptionsParser('h::l', ['help', 'list']))
+        $opts = (new OptionsParser(['h::', 'help', 'l|list']))
             ->setBypassUnknown(true)
             ->parse($args);
 
@@ -21,7 +21,7 @@ class HelpCommand extends BaseCommand
             );
         }
 
-        if ($opts->hasOpt('l', 'list')) {
+        if ($opts->hasOpt('l')) {
             echo <<<'_END'
 maze [command] [options]
 

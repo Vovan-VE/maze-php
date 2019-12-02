@@ -11,34 +11,21 @@ class OptionsParser
     public const V_REQUIRED = 2;
     public const V_OPTIONAL = 3;
 
-    private $short = [];
-    private $long = [];
+    private $types = [];
+    private $shortAlias = [];
+    private $longAlias = [];
 
     /** @var bool Whether to bypass unknown options as plain values */
     private $bypassUnknown = false;
 
-    private const BAD_SHORT_KEYS = '-:';
-
     /**
      * OptionsParser constructor.
-     * @param string $short Short options in std `getopt()` manner
-     * @param array $long Long options in std `getopt()` manner
+     * @param array $long
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $short, array $long = [])
+    public function __construct(array $long = [])
     {
-        $this->short = $this->parseDefinition(
-            self::expandShortDefinition($short)
-        );
-        $this->long = $this->parseDefinition($long);
-
-        $overlapped = array_intersect_key($this->short, $this->long);
-        if ($overlapped) {
-            throw new \InvalidArgumentException(
-                'Some options duplicated in short and long forms: '
-                . join(', ', array_map('json_encode', array_keys($overlapped)))
-            );
-        }
+        $this->initDefinition($long);
     }
 
     /**
@@ -82,7 +69,7 @@ class OptionsParser
                     $value = \substr($arg, $eqPos + 1);
                 }
 
-                if (!isset($this->long[$name])) {
+                if (!isset($this->longAlias[$name])) {
                     if ($this->getBypassUnknown()) {
                         $plainValues[] = $arg;
                         continue;
@@ -93,7 +80,8 @@ class OptionsParser
                     );
                 }
 
-                $type = $this->long[$name];
+                $mainName = $this->longAlias[$name];
+                $type = $this->types[$mainName];
 
                 if ($type === self::V_NO) {
                     if ($value !== true) {
@@ -118,7 +106,7 @@ class OptionsParser
                 // -a
                 // -a...
                 $name = $arg[1];
-                if (!isset($this->short[$name])) {
+                if (!isset($this->shortAlias[$name])) {
                     if ($this->getBypassUnknown()) {
                         $plainValues[] = $arg;
                         $i++;
@@ -130,7 +118,8 @@ class OptionsParser
                     );
                 }
 
-                $type = $this->short[$name];
+                $mainName = $this->shortAlias[$name];
+                $type = $this->types[$mainName];
 
                 if ($len === 2) {
                     // '-a'
@@ -175,7 +164,7 @@ class OptionsParser
                 }
             }
 
-            $result[$name] = $value;
+            $result[$mainName] = $value;
         }
 
         if ($i >= $count) {
@@ -188,16 +177,19 @@ class OptionsParser
             }
         }
 
-        return new Options($result,$plainValues,$rest);
+        return new Options($result, $plainValues, $rest);
     }
 
     /**
      * @param iterable|string[] $options
-     * @return array
+     * @return void
      */
-    protected function parseDefinition(iterable $options): array
+    protected function initDefinition(iterable $options): void
     {
-        $result = [];
+        $allAliases = [];
+        $types = [];
+        $short = [];
+        $long = [];
 
         foreach ($options as $option) {
             $type = self::V_NO;
@@ -211,57 +203,60 @@ class OptionsParser
                 }
             }
 
-            if (isset($result[$option])) {
-                throw new \InvalidArgumentException(
-                    "Duplicate option '$option'"
-                );
-            }
+            $aliases = array_unique(explode('|', $option));
+            [$name] = $aliases;
+            $types[$name] = $type;
 
-            $result[$option] = $type;
+            foreach ($aliases as $alias) {
+                if ('' === $alias || '-' === $alias[0]) {
+                    throw new \InvalidArgumentException(
+                        "Bad option name '$alias'"
+                    );
+                }
+
+                if (isset($allAliases[$alias])) {
+                    throw new \InvalidArgumentException(
+                        "Duplicate option '$alias'"
+                    );
+                }
+
+                $allAliases[$alias] = true;
+
+                if (\strlen($alias) === 1) {
+                    $short[$alias] = $name;
+                } else {
+                    $long[$alias] = $name;
+                }
+            }
         }
 
-        return $result;
-    }
-
-    /**
-     * @param string $options
-     * @return \Generator|string[]
-     */
-    public static function expandShortDefinition(string $options): \Generator
-    {
-        for ($i = 0, $len = \strlen($options); $i < $len; $i++) {
-            $option = $options[$i];
-            if (false !== \strpos(self::BAD_SHORT_KEYS, $option)) {
-                throw new \InvalidArgumentException(
-                    "Bad key `$option` at offset $i"
-                );
-            }
-            for (
-                $n = 1, $p = $i + 1;
-                $n <= 2 && $p < $len && $options[$p] === ':';
-                $n++, $p++
-            ) {
-                $option .= ':';
-                $i++;
-            }
-            yield $option;
-        }
+        $this->types = $types;
+        $this->shortAlias = $short;
+        $this->longAlias = $long;
     }
 
     /**
      * @return array
      */
-    final public function getShort(): array
+    final public function getTypes(): array
     {
-        return $this->short;
+        return $this->types;
     }
 
     /**
      * @return array
      */
-    final public function getLong(): array
+    final public function getShortAlias(): array
     {
-        return $this->long;
+        return $this->shortAlias;
+    }
+
+    /**
+     * @return array
+     */
+    final public function getLongAlias(): array
+    {
+        return $this->longAlias;
     }
 
     /**
