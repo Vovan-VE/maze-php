@@ -38,9 +38,7 @@ class Options
     public function hasOpt(string ...$name): bool
     {
         foreach ($name as $opt) {
-            // minimal PHP 7.2 allow us to drop outdated optimization
-            // `isset($a[$k]) || array_key_exists($k, $a)`
-            if (array_key_exists($opt, $this->opt)) {
+            if (isset($this->opt[$opt])) {
                 return true;
             }
         }

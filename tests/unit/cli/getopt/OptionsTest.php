@@ -10,7 +10,7 @@ class OptionsTest extends BaseTestCase
     public function testGetters()
     {
         $options = [
-            'switch' => null,
+            'switch' => true,
             'option' => 'value',
         ];
         $mixed = ['lorem', 'ipsum', 'dolor'];
@@ -29,8 +29,8 @@ class OptionsTest extends BaseTestCase
         $this->assertTrue($opt->hasOpt('option', 'omitted'));
         $this->assertFalse($opt->hasOpt('omitted', 'unknown'));
 
-        $this->assertEquals(null, $opt->getOpt('switch'));
-        $this->assertEquals(null, $opt->getOpt('switch', 42));
+        $this->assertEquals(true, $opt->getOpt('switch'));
+        $this->assertEquals(true, $opt->getOpt('switch', 42));
         $this->assertEquals('value', $opt->getOpt('option'));
         $this->assertEquals('value', $opt->getOpt('option', 42));
         $this->assertEquals(null, $opt->getOpt('missing'));

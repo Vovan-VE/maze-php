@@ -29,7 +29,7 @@ class OptionsParser
     }
 
     /**
-     * @param array $args
+     * @param string[] $args
      * @return Options
      */
     public function parse(array $args): Options
