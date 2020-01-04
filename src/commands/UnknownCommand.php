@@ -8,7 +8,7 @@ class UnknownCommand extends BaseCommand
 {
     public function run(array $args): int
     {
-        Console::stderr("E! Unknown command `{$this->name}`", PHP_EOL);
+        Console::stderr("E! Unknown command `{$this->name}`", \PHP_EOL);
         return 1;
     }
 

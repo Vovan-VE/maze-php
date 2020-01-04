@@ -39,8 +39,8 @@ class App
         try {
             return $this->command->run($this->args);
         } catch (InvalidOptionException $e) {
-            Console::stderr('maze: ', $e->getMessage(), PHP_EOL);
-            Console::stderr("Run `maze help {$this->command->getName()}`", PHP_EOL);
+            Console::stderr('maze: ', $e->getMessage(), \PHP_EOL);
+            Console::stderr("Run `maze help {$this->command->getName()}`", \PHP_EOL);
             return 2;
         }
     }

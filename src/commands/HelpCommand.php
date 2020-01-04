@@ -17,7 +17,7 @@ class HelpCommand extends BaseCommand
             Console::stderr(
                 'W! key `-h` used with a value - did you mean ',
                 '`-H` (`--height`) from `gen` command?',
-                PHP_EOL
+                \PHP_EOL
             );
         }
 
@@ -37,7 +37,7 @@ _END;
                 if ($isDefault) {
                     echo '       default command';
                 }
-                echo PHP_EOL;
+                echo \PHP_EOL;
             }
 
             echo <<<'_END'
@@ -58,7 +58,7 @@ _END;
             }
             Console::stderr(
                 "E! Unknown help topic `$commandName`",
-                PHP_EOL
+                \PHP_EOL
             );
         }
 
