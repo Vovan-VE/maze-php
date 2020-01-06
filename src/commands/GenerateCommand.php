@@ -6,6 +6,8 @@ use VovanVE\MazeProject\cli\Console;
 use VovanVE\MazeProject\cli\getopt\Options;
 use VovanVE\MazeProject\cli\getopt\OptionsParser;
 use VovanVE\MazeProject\maze\Config;
+use VovanVE\MazeProject\maze\export\TextExporter;
+use VovanVE\MazeProject\maze\Generator;
 
 class GenerateCommand extends BaseCommand
 {
@@ -32,11 +34,10 @@ class GenerateCommand extends BaseCommand
             return 2;
         }
 
-        Console::stderr(
-            "Maze {$config->getWidth()}x{$config->getHeight()}, branch {$config->getBranchLength()}",
-            \PHP_EOL
-        );
-        Console::stderr('I: not implemented', \PHP_EOL);
+        $maze = (new Generator($config))->generate();
+
+        echo (new TextExporter())->exportMaze($maze), \PHP_EOL;
+
         return 0;
     }
 

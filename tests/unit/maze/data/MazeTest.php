@@ -4,6 +4,7 @@ namespace VovanVE\MazeProject\tests\unit\maze\data;
 
 use VovanVE\MazeProject\maze\data\Cell;
 use VovanVE\MazeProject\maze\data\Direction;
+use VovanVE\MazeProject\maze\data\DoorPosition;
 use VovanVE\MazeProject\maze\data\Maze;
 use VovanVE\MazeProject\tests\helpers\BaseTestCase;
 
@@ -12,6 +13,9 @@ class MazeTest extends BaseTestCase
     public function testCreate(): Maze
     {
         $maze = new Maze(4, 3);
+
+        $this->assertEquals(4, $maze->getWidth());
+        $this->assertEquals(3, $maze->getHeight());
 
         $actualCoords = [];
         foreach ($maze->getAllCells() as $cell) {
@@ -234,5 +238,167 @@ class MazeTest extends BaseTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Target cell is not edge cell');
         $maze->removeWalls(2, 0, Direction::LEFT, true);
+    }
+
+    public function testSetEntrance()
+    {
+        $maze = new Maze(3, 2);
+        $this->assertNull($maze->getEntrance());
+
+        $maze->setEntrance(Direction::TOP, 0);
+        $this->assertEquals(
+            new DoorPosition(Direction::TOP, 0),
+            $maze->getEntrance()
+        );
+        $this->assertFalse($maze->getCell(0, 0)->topWall);
+
+        $maze->setEntrance(Direction::TOP, 2);
+        $this->assertEquals(
+            new DoorPosition(Direction::TOP, 2),
+            $maze->getEntrance()
+        );
+        $this->assertFalse($maze->getCell(2, 0)->topWall);
+
+        $maze->setEntrance(Direction::RIGHT, 0);
+        $this->assertEquals(
+            new DoorPosition(Direction::RIGHT, 0),
+            $maze->getEntrance()
+        );
+        $this->assertFalse($maze->getCell(2, 0)->rightWall);
+
+        $maze->setEntrance(Direction::RIGHT, 1);
+        $this->assertEquals(
+            new DoorPosition(Direction::RIGHT, 1),
+            $maze->getEntrance()
+        );
+        $this->assertFalse($maze->getCell(2, 1)->rightWall);
+
+        $maze->setEntrance(Direction::BOTTOM, 2);
+        $this->assertEquals(
+            new DoorPosition(Direction::BOTTOM, 2),
+            $maze->getEntrance()
+        );
+        $this->assertFalse($maze->getCell(2, 1)->bottomWall);
+
+        $maze->setEntrance(Direction::BOTTOM, 0);
+        $this->assertEquals(
+            new DoorPosition(Direction::BOTTOM, 0),
+            $maze->getEntrance()
+        );
+        $this->assertFalse($maze->getCell(0, 1)->bottomWall);
+
+        $maze->setEntrance(Direction::LEFT, 1);
+        $this->assertEquals(
+            new DoorPosition(Direction::LEFT, 1),
+            $maze->getEntrance()
+        );
+        $this->assertFalse($maze->getCell(0, 1)->leftWall);
+
+        $maze->setEntrance(Direction::LEFT, 0);
+        $this->assertEquals(
+            new DoorPosition(Direction::LEFT, 0),
+            $maze->getEntrance()
+        );
+        $this->assertFalse($maze->getCell(0, 0)->leftWall);
+    }
+
+    public function testSetExit()
+    {
+        $maze = new Maze(3, 2);
+        $this->assertNull($maze->getExit());
+
+        $maze->setExit(Direction::TOP, 0);
+        $this->assertEquals(
+            new DoorPosition(Direction::TOP, 0),
+            $maze->getExit()
+        );
+        $this->assertFalse($maze->getCell(0, 0)->topWall);
+
+        $maze->setExit(Direction::TOP, 2);
+        $this->assertEquals(
+            new DoorPosition(Direction::TOP, 2),
+            $maze->getExit()
+        );
+        $this->assertFalse($maze->getCell(2, 0)->topWall);
+
+        $maze->setExit(Direction::RIGHT, 0);
+        $this->assertEquals(
+            new DoorPosition(Direction::RIGHT, 0),
+            $maze->getExit()
+        );
+        $this->assertFalse($maze->getCell(2, 0)->rightWall);
+
+        $maze->setExit(Direction::RIGHT, 1);
+        $this->assertEquals(
+            new DoorPosition(Direction::RIGHT, 1),
+            $maze->getExit()
+        );
+        $this->assertFalse($maze->getCell(2, 1)->rightWall);
+
+        $maze->setExit(Direction::BOTTOM, 2);
+        $this->assertEquals(
+            new DoorPosition(Direction::BOTTOM, 2),
+            $maze->getExit()
+        );
+        $this->assertFalse($maze->getCell(2, 1)->bottomWall);
+
+        $maze->setExit(Direction::BOTTOM, 0);
+        $this->assertEquals(
+            new DoorPosition(Direction::BOTTOM, 0),
+            $maze->getExit()
+        );
+        $this->assertFalse($maze->getCell(0, 1)->bottomWall);
+
+        $maze->setExit(Direction::LEFT, 1);
+        $this->assertEquals(
+            new DoorPosition(Direction::LEFT, 1),
+            $maze->getExit()
+        );
+        $this->assertFalse($maze->getCell(0, 1)->leftWall);
+
+        $maze->setExit(Direction::LEFT, 0);
+        $this->assertEquals(
+            new DoorPosition(Direction::LEFT, 0),
+            $maze->getExit()
+        );
+        $this->assertFalse($maze->getCell(0, 0)->leftWall);
+    }
+
+    public function testSetEntranceConflict()
+    {
+        $maze = new Maze(3, 2);
+        $maze->setExit(Direction::TOP, 2);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('This place is already assigned to Exit');
+        $maze->setEntrance(Direction::TOP, 2);
+    }
+
+    public function testSetExitConflict()
+    {
+        $maze = new Maze(3, 2);
+        $maze->setEntrance(Direction::TOP, 2);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('This place is already assigned to Entrance');
+        $maze->setExit(Direction::TOP, 2);
+    }
+
+    public function testGetEntranceCell()
+    {
+        $maze = new Maze(3, 2);
+        $this->assertNull($maze->getEntranceCell());
+
+        $maze->setEntrance(Direction::BOTTOM, 2);
+        $this->assertSame($maze->getCell(2, 1), $maze->getEntranceCell());
+    }
+
+    public function testGetExitCell()
+    {
+        $maze = new Maze(3, 2);
+        $this->assertNull($maze->getExitCell());
+
+        $maze->setEntrance(Direction::BOTTOM, 2);
+        $this->assertSame($maze->getCell(2, 1), $maze->getExitCell());
     }
 }
