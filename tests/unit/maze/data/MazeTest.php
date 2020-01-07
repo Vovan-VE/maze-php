@@ -398,7 +398,7 @@ class MazeTest extends BaseTestCase
         $maze = new Maze(3, 2);
         $this->assertNull($maze->getExitCell());
 
-        $maze->setEntrance(Direction::BOTTOM, 2);
+        $maze->setExit(Direction::BOTTOM, 2);
         $this->assertSame($maze->getCell(2, 1), $maze->getExitCell());
     }
 }

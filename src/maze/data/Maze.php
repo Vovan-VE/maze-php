@@ -75,14 +75,22 @@ class Maze
         return $this->out;
     }
 
+    /**
+     * @return Cell|null
+     * @deprecated Unused yet
+     */
     public function getEntranceCell(): ?Cell
     {
         return $this->getDoorCell($this->in);
     }
 
+    /**
+     * @return Cell|null
+     * @deprecated Unused yet
+     */
     public function getExitCell(): ?Cell
     {
-        return $this->getDoorCell($this->in);
+        return $this->getDoorCell($this->out);
     }
 
     public function getCell(int $x, int $y): Cell
