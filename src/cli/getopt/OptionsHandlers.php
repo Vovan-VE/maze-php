@@ -6,14 +6,14 @@ class OptionsHandlers
 {
     public static function getCounter(): \Closure
     {
-        return function (?int $prev) {
+        return function (?int $prev): int {
             return ($prev ?? 0) + 1;
         };
     }
 
     public static function getMapper($noValue = true): \Closure
     {
-        return function (?array $map, $value) use ($noValue) {
+        return function (?array $map, $value) use ($noValue): array {
             if (null === $map) {
                 $map = [];
             }
