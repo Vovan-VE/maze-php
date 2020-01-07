@@ -187,4 +187,86 @@ class TextExporterTest extends BaseTestCase
         ]);
         $this->assertEquals($result, $exporter->exportMaze($maze));
     }
+
+    public function testConfigure()
+    {
+        $maze = new Maze(1, 1);
+        $maze->setEntrance(Direction::LEFT, 0);
+        $maze->setExit(Direction::BOTTOM, 0);
+
+        $exporter = new TextExporter();
+        $exporter->configureExport([
+            'wall' => '▒▒',
+            'in' => '()',
+            'out' => '[]',
+        ]);
+
+        $result = \join(\PHP_EOL, [
+            '▒▒▒▒▒▒',
+            '()  ▒▒',
+            '▒▒[]▒▒',
+        ]);
+        $this->assertEquals($result, $exporter->exportMaze($maze));
+    }
+
+    /**
+     * @param array $config
+     * @param string $errorMessage
+     * @dataProvider dataConfigureFail
+     */
+    public function testConfigureFail(array $config, string $errorMessage)
+    {
+        $exporter = new TextExporter();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage($errorMessage);
+
+        $exporter->configureExport($config);
+    }
+
+    public function dataConfigureFail()
+    {
+        return [
+            [
+                ['wall' => null],
+                'Value for `wall` must be non empty string',
+            ],
+            [
+                ['wall' => 42],
+                'Value for `wall` must be non empty string',
+            ],
+            [
+                ['wall' => ''],
+                'Value for `wall` must be non empty string',
+            ],
+            [
+                ['in' => null],
+                'Value for `in` must be non empty string',
+            ],
+            [
+                ['in' => 42],
+                'Value for `in` must be non empty string',
+            ],
+            [
+                ['in' => ''],
+                'Value for `in` must be non empty string',
+            ],
+            [
+                ['out' => null],
+                'Value for `out` must be non empty string',
+            ],
+            [
+                ['out' => 42],
+                'Value for `out` must be non empty string',
+            ],
+            [
+                ['out' => ''],
+                'Value for `out` must be non empty string',
+            ],
+            [
+                ['UNKNOWN_42' => ''],
+                'Unknown option `UNKNOWN_42`',
+            ],
+        ];
+    }
 }
