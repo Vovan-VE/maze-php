@@ -3,6 +3,7 @@
 namespace VovanVE\MazeProject\tests\unit\cli\getopt;
 
 use VovanVE\MazeProject\cli\getopt\Options;
+use VovanVE\MazeProject\cli\getopt\OptionsHandlers;
 use VovanVE\MazeProject\cli\getopt\OptionsParser;
 use VovanVE\MazeProject\cli\getopt\InvalidOptionException;
 use VovanVE\MazeProject\tests\helpers\BaseTestCase;
@@ -426,5 +427,28 @@ class OptionsParserTest extends BaseTestCase
                 ),
             ],
         ];
+    }
+
+    public function testHandlers()
+    {
+        $getopt = new OptionsParser([
+            'v|verbose' => OptionsHandlers::getCounter(),
+            'd|define:' => OptionsHandlers::getMapper(),
+        ]);
+
+        $this->assertEquals([], $getopt->parse([])->getOptions());
+
+        $this->assertEquals(
+            [
+                'v' => 4,
+                'd' => [
+                    'foo' => 42,
+                    'bar' => true,
+                ],
+            ],
+            $getopt->parse(
+                ['-v', '-d', 'foo=37', '-vvv', '-d', 'bar', '-dfoo=42']
+            )->getOptions()
+        );
     }
 }

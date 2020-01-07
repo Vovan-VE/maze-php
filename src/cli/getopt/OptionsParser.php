@@ -14,6 +14,8 @@ class OptionsParser
     private $types = [];
     private $shortAlias = [];
     private $longAlias = [];
+    /** @var \Closure[] */
+    private $handlers = [];
 
     /** @var bool Whether to bypass unknown options as plain values */
     private $bypassUnknown = false;
@@ -164,6 +166,12 @@ class OptionsParser
                 }
             }
 
+            if (isset($this->handlers[$mainName])) {
+                $value = ($this->handlers[$mainName])(
+                    $result[$mainName] ?? null,
+                    $value
+                );
+            }
             $result[$mainName] = $value;
         }
 
@@ -181,7 +189,7 @@ class OptionsParser
     }
 
     /**
-     * @param iterable|string[] $options
+     * @param iterable|string[]|\Closure[] $options
      * @return void
      */
     protected function initDefinition(iterable $options): void
@@ -190,8 +198,18 @@ class OptionsParser
         $types = [];
         $short = [];
         $long = [];
+        $handlers = [];
 
-        foreach ($options as $option) {
+        foreach ($options as $option => $handler) {
+            if (is_int($option)) {
+                $option = $handler;
+                $handler = null;
+            } elseif (!$handler instanceof \Closure) {
+                throw new \InvalidArgumentException(
+                    'Value in `key=>value` case must be a Closure'
+                );
+            }
+
             $type = self::V_NO;
             if (\strlen($option) > 1 && $option[-1] === ':') {
                 $type = self::V_REQUIRED;
@@ -206,6 +224,9 @@ class OptionsParser
             $aliases = array_unique(explode('|', $option));
             [$name] = $aliases;
             $types[$name] = $type;
+            if (null !== $handler) {
+                $handlers[$name] = $handler;
+            }
 
             foreach ($aliases as $alias) {
                 if ('' === $alias || '-' === $alias[0]) {
@@ -233,6 +254,7 @@ class OptionsParser
         $this->types = $types;
         $this->shortAlias = $short;
         $this->longAlias = $long;
+        $this->handlers = $handlers;
     }
 
     /**
