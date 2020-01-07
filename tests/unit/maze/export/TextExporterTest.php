@@ -11,6 +11,9 @@ class TextExporterTest extends BaseTestCase
 {
     public function testExportAllWalls()
     {
+        $maze = new Maze(3, 3);
+        $exporter = new TextExporter();
+
         $result = \join(\PHP_EOL, [
             '#######',
             '# # # #',
@@ -20,14 +23,15 @@ class TextExporterTest extends BaseTestCase
             '# # # #',
             '#######',
         ]);
-        $maze = new Maze(3, 3);
-
-        $exporter = new TextExporter();
         $this->assertEquals($result, $exporter->exportMaze($maze));
     }
 
-    public function testExportWallChar()
+    public function testExportCustomWall()
     {
+        $maze = new Maze(3, 3);
+        $exporter = new TextExporter();
+        $exporter->wall = '▒';
+
         $result = \join(\PHP_EOL, [
             '▒▒▒▒▒▒▒',
             '▒ ▒ ▒ ▒',
@@ -37,10 +41,28 @@ class TextExporterTest extends BaseTestCase
             '▒ ▒ ▒ ▒',
             '▒▒▒▒▒▒▒',
         ]);
+        $this->assertEquals($result, $exporter->exportMaze($maze));
+    }
+
+    public function testExportCustomWallMultiple()
+    {
         $maze = new Maze(3, 3);
+        $maze->setEntrance(Direction::LEFT, 0);
+        $maze->setExit(Direction::RIGHT, 2);
 
         $exporter = new TextExporter();
-        $exporter->wallChar = '▒';
+        $exporter->wall = '▓█▓';
+        $exporter->in = '()';
+
+        $result = \join(\PHP_EOL, [
+            '▓█▓▓█▓▓█▓▓█▓▓█▓▓█▓▓█▓',
+            '()(   ▓█▓   ▓█▓   ▓█▓',
+            '▓█▓▓█▓▓█▓▓█▓▓█▓▓█▓▓█▓',
+            '▓█▓   ▓█▓   ▓█▓   ▓█▓',
+            '▓█▓▓█▓▓█▓▓█▓▓█▓▓█▓▓█▓',
+            '▓█▓   ▓█▓   ▓█▓   EEE',
+            '▓█▓▓█▓▓█▓▓█▓▓█▓▓█▓▓█▓',
+        ]);
         $this->assertEquals($result, $exporter->exportMaze($maze));
     }
 

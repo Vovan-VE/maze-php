@@ -8,34 +8,68 @@ use VovanVE\MazeProject\maze\data\Maze;
 
 class TextExporter implements MazeExporterInterface
 {
-    public $wallChar = '#';
+    public $wall = '#';
+    public $in = 'i';
+    public $out = 'E';
+
+    public function configureExport(array $options): void
+    {
+        foreach ($options as $name => $value) {
+            switch ($name) {
+                case 'wall':
+                    $this->validateOptionValueString($name, $value);
+                    $this->wall = $value;
+                    break;
+
+                case 'in':
+                    $this->validateOptionValueString($name, $value);
+                    $this->in = $value;
+                    break;
+
+                case 'out':
+                    $this->validateOptionValueString($name, $value);
+                    $this->out = $value;
+                    break;
+
+                default:
+                    throw new \InvalidArgumentException("Unknown option `$name`");
+            }
+        }
+    }
 
     public function exportMaze(Maze $maze): string
     {
         $w = $maze->getWidth();
         $h = $maze->getHeight();
 
+        $charsCount = \mb_strlen($this->wall, 'UTF-8');
+        $space = \str_repeat(' ', $charsCount);
+
         /** @var string[][] $lines */
-        $lines = \array_fill(0, $h * 2 + 1, \array_fill(0, $w * 2 + 1, $this->wallChar));
+        $lines = \array_fill(
+            0,
+            $h * 2 + 1,
+            \array_fill(0, $w * 2 + 1, $this->wall)
+        );
 
         for ($y = 0; $y < $h; $y++) {
             $sy = $y * 2 + 1;
             for ($x = 0; $x < $w; $x++) {
                 $sx = $x * 2 + 1;
-                $lines[$sy][$sx] = ' ';
+                $lines[$sy][$sx] = $space;
 
                 $cell = $maze->getCell($x, $y);
                 if (0 === $y && !$cell->topWall) {
-                    $lines[$sy - 1][$sx] = ' ';
+                    $lines[$sy - 1][$sx] = $space;
                 }
                 if (0 === $x && !$cell->leftWall) {
-                    $lines[$sy][$sx - 1] = ' ';
+                    $lines[$sy][$sx - 1] = $space;
                 }
                 if (!$cell->bottomWall) {
-                    $lines[$sy + 1][$sx] = ' ';
+                    $lines[$sy + 1][$sx] = $space;
                 }
                 if (!$cell->rightWall) {
-                    $lines[$sy][$sx + 1] = ' ';
+                    $lines[$sy][$sx + 1] = $space;
                 }
             }
         }
@@ -43,10 +77,12 @@ class TextExporter implements MazeExporterInterface
         $in = $maze->getEntrance();
         $out = $maze->getExit();
         if ($in) {
-            $this->markDoor($lines, $in, 'i');
+            $inStr = $this->repeatStringToLength($this->in, $charsCount);
+            $this->markDoor($lines, $in, $inStr);
         }
         if ($out) {
-            $this->markDoor($lines, $out, 'E');
+            $outStr = $this->repeatStringToLength($this->out, $charsCount);
+            $this->markDoor($lines, $out, $outStr);
         }
 
         return \join(\PHP_EOL, \array_map('join', $lines));
@@ -88,5 +124,32 @@ class TextExporter implements MazeExporterInterface
         }
 
         $lines[$y][$x] = $char;
+    }
+
+    /**
+     * @param string $str
+     * @param int $length
+     * @return string
+     */
+    private function repeatStringToLength(string $str, int $length): string
+    {
+        return \mb_substr(
+            \str_repeat(
+                $str,
+                \ceil($length / \mb_strlen($str, 'UTF-8'))
+            ),
+            0,
+            $length,
+            'UTF-8'
+        );
+    }
+
+    private function validateOptionValueString(string $name, $value): void
+    {
+        if (!\is_string($value) || '' === $value) {
+            throw new \InvalidArgumentException(
+                "Value for `$name` must be non empty string"
+            );
+        }
     }
 }

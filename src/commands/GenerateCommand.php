@@ -3,7 +3,9 @@
 namespace VovanVE\MazeProject\commands;
 
 use VovanVE\MazeProject\cli\Console;
+use VovanVE\MazeProject\cli\getopt\InvalidOptionException;
 use VovanVE\MazeProject\cli\getopt\Options;
+use VovanVE\MazeProject\cli\getopt\OptionsHandlers;
 use VovanVE\MazeProject\cli\getopt\OptionsParser;
 use VovanVE\MazeProject\maze\Config;
 use VovanVE\MazeProject\maze\export\TextExporter;
@@ -23,7 +25,8 @@ class GenerateCommand extends BaseCommand
                 'H|height:',
                 's|size:',
                 'B|branch-length:',
-                'F|format:'
+                'F|format:',
+                'c:' => OptionsHandlers::getMapper(),
             ]
         ))
             ->parse($args);
@@ -34,9 +37,12 @@ class GenerateCommand extends BaseCommand
             return 2;
         }
 
+        $exporter = new TextExporter();
+        $this->configureExporter($exporter, $opts);
+
         $maze = (new Generator($config))->generate();
 
-        echo (new TextExporter())->exportMaze($maze), \PHP_EOL;
+        echo ($exporter)->exportMaze($maze), \PHP_EOL;
 
         return 0;
     }
@@ -73,6 +79,9 @@ Options:
     -f <FORMAT>, --format=<FORMAT>
         Output format. Can be one of `art`, `json` or `text`. The default is
         `art` to be human readable.
+
+    -c <NAME>=<VALUE>
+        Output format option. The `<NAME>` depends on chosen format in `-f`.
 
 _END;
     }
@@ -218,5 +227,26 @@ _END;
 
         $out = $int;
         return true;
+    }
+
+    /**
+     * @param TextExporter $exporter
+     * @param array $options
+     */
+    private function configureExporter(
+        TextExporter $exporter,
+        Options $opts
+    ): void {
+        if (!$opts->hasOpt('c')) {
+            return;
+        }
+
+        try {
+            $exporter->configureExport($opts->getOpt('c'));
+        } catch (\InvalidArgumentException $e) {
+            throw new InvalidOptionException(
+                "invalid option in `-c`: " . $e->getMessage()
+            );
+        }
     }
 }
