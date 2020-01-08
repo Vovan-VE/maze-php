@@ -8,7 +8,8 @@ use VovanVE\MazeProject\cli\getopt\Options;
 use VovanVE\MazeProject\cli\getopt\OptionsHandlers;
 use VovanVE\MazeProject\cli\getopt\OptionsParser;
 use VovanVE\MazeProject\maze\Config;
-use VovanVE\MazeProject\maze\export\TextExporter;
+use VovanVE\MazeProject\maze\export\MazeExporterInterface;
+use VovanVE\MazeProject\maze\Exporters;
 use VovanVE\MazeProject\maze\Generator;
 
 class GenerateCommand extends BaseCommand
@@ -16,6 +17,7 @@ class GenerateCommand extends BaseCommand
     private const DEF_WIDTH = 30;
     private const DEF_HEIGHT = 10;
     private const DEF_BRANCH_LENGTH = 10;
+    private const DEF_FORMAT = Exporters::F_TEXT;
 
     public function run(array $args): int
     {
@@ -37,7 +39,7 @@ class GenerateCommand extends BaseCommand
             return 2;
         }
 
-        $exporter = new TextExporter();
+        $exporter = Exporters::getExporter($config->getFormat());
         $this->configureExporter($exporter, $opts);
 
         $maze = (new Generator($config))->generate();
@@ -96,8 +98,7 @@ _END;
         $width = self::DEF_WIDTH;
         $height = self::DEF_HEIGHT;
         $branchLength = self::DEF_BRANCH_LENGTH;
-        // TODO: formats
-        $format = 'art';
+        $format = self::DEF_FORMAT;
 
         if ($opts->hasOpt('s')) {
             if ($opts->hasOpt('W', 'H')) {
@@ -154,14 +155,13 @@ _END;
             return null;
         }
 
-        if ($opts->hasOpt('f')) {
-            //$formatStr = $opts->getOpt('f');
-            // TODO: formats
-            // TODO: validate
-            Console::stderr(
-                'W! Format choise is not implemented yet',
-                \PHP_EOL
-            );
+        if ($opts->hasOpt('F')) {
+            $formatStr = $opts->getOpt('F');
+            if (!Exporters::hasFormat($formatStr)) {
+                $error = "E: unknown format name in `-F` (`--format`)";
+                return null;
+            }
+            $format = $formatStr;
         }
 
         return new Config($width, $height, $branchLength, $format);
@@ -230,11 +230,11 @@ _END;
     }
 
     /**
-     * @param TextExporter $exporter
+     * @param MazeExporterInterface $exporter
      * @param array $options
      */
     private function configureExporter(
-        TextExporter $exporter,
+        MazeExporterInterface $exporter,
         Options $opts
     ): void {
         if (!$opts->hasOpt('c')) {
