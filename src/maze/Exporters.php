@@ -2,14 +2,17 @@
 
 namespace VovanVE\MazeProject\maze;
 
+use VovanVE\MazeProject\maze\export\JsonExporter;
 use VovanVE\MazeProject\maze\export\MazeExporterInterface;
 use VovanVE\MazeProject\maze\export\TextExporter;
 
 class Exporters
 {
+    public const F_JSON = 'json';
     public const F_TEXT = 'text';
 
     private const CLASSES = [
+        self::F_JSON => JsonExporter::class,
         self::F_TEXT => TextExporter::class,
     ];
 

@@ -10,6 +10,7 @@ class ExportersTest extends BaseTestCase
 {
     public function testHasFormat()
     {
+        $this->assertTrue(Exporters::hasFormat(Exporters::F_JSON));
         $this->assertTrue(Exporters::hasFormat(Exporters::F_TEXT));
 
         $this->assertFalse(Exporters::hasFormat('*UNKNOWN'));
@@ -17,6 +18,10 @@ class ExportersTest extends BaseTestCase
 
     public function testGetFormatter()
     {
+        $this->assertInstanceOf(
+            MazeExporterInterface::class,
+            Exporters::getExporter(Exporters::F_JSON)
+        );
         $this->assertInstanceOf(
             MazeExporterInterface::class,
             Exporters::getExporter(Exporters::F_TEXT)
