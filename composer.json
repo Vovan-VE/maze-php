@@ -1,5 +1,6 @@
 {
   "name": "vovan-ve/maze-project-php",
+  "version": "0.1.0",
   "description": "The Maze Project implementation in PHP",
   "type": "project",
   "license": "MIT",
