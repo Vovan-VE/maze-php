@@ -45,6 +45,32 @@ class Cell
         return $this->y;
     }
 
+    public function isSameCoords(Cell $to): bool
+    {
+        return (
+            $this === $to ||
+            $this->x === $to->getX() && $this->y === $to->getY()
+        );
+    }
+
+    public function hasWallAt(int $direction): bool
+    {
+        switch ($direction) {
+            case Direction::TOP:
+                return $this->topWall;
+
+            case Direction::RIGHT:
+                return $this->rightWall;
+
+            case Direction::BOTTOM:
+                return $this->bottomWall;
+
+            case Direction::LEFT:
+                return $this->leftWall;
+        }
+        return false;
+    }
+
     public function setWallAt(int $direction, bool $wall): void
     {
         switch ($direction) {

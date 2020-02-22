@@ -77,7 +77,6 @@ class Maze
 
     /**
      * @return Cell|null
-     * @deprecated Unused yet
      */
     public function getEntranceCell(): ?Cell
     {
@@ -86,7 +85,6 @@ class Maze
 
     /**
      * @return Cell|null
-     * @deprecated Unused yet
      */
     public function getExitCell(): ?Cell
     {

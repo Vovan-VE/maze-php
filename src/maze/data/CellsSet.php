@@ -2,20 +2,14 @@
 
 namespace VovanVE\MazeProject\maze\data;
 
-class CellsSet
+use VovanVE\MazeProject\maze\data\base\Cells;
+
+class CellsSet extends Cells
 {
-    /** @var Cell[] */
-    private $cells = [];
-
-    public function isEmpty(): bool
-    {
-        return [] === $this->cells;
-    }
-
     public function add(Cell $cell): void
     {
         $key = $this->getKey($cell);
-        if (isset($this->cells[$key])) {
+        if ($this->hasKey($key)) {
             if ($this->cells[$key] !== $cell) {
                 throw new \LogicException(
                     'Trying to add different cell with the same coords'
@@ -31,11 +25,6 @@ class CellsSet
         unset($this->cells[$this->getKey($cell)]);
     }
 
-    public function has(Cell $cell): bool
-    {
-        return isset($this->cells[$this->getKey($cell)]);
-    }
-
     public function getRandom(): Cell
     {
         if ($this->isEmpty()) {
@@ -46,10 +35,5 @@ class CellsSet
         $index = \mt_rand(0, $count - 1);
         $slice = \array_slice($this->cells, $index, 1);
         return reset($slice);
-    }
-
-    private function getKey(Cell $cell): string
-    {
-        return "{$cell->getX()};{$cell->getY()}";
     }
 }

@@ -14,6 +14,11 @@ class Direction
         return \mt_rand(1, 4);
     }
 
+    public static function prev(int $from): int
+    {
+        return ($from + 2) % 4 + 1;
+    }
+
     public static function next(int $from): int
     {
         return $from % 4 + 1;

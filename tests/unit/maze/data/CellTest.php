@@ -79,4 +79,31 @@ class CellTest extends BaseTestCase
         $this->assertTrue($cell->bottomWall);
         $this->assertTrue($cell->leftWall);
     }
+
+    public function testIsSameCoords()
+    {
+        $a = new Cell(0, 0);
+
+        $this->assertTrue($a->isSameCoords($a));
+        $this->assertTrue($a->isSameCoords(new Cell(0, 0)));
+
+        $this->assertFalse($a->isSameCoords(new Cell(0, 1)));
+        $this->assertFalse($a->isSameCoords(new Cell(1, 0)));
+        $this->assertFalse($a->isSameCoords(new Cell(1, 1)));
+    }
+
+    public function testHasWallAt()
+    {
+        $c = new Cell(0, 0);
+        $this->assertTrue($c->hasWallAt(Direction::TOP));
+        $this->assertTrue($c->hasWallAt(Direction::RIGHT));
+        $this->assertTrue($c->hasWallAt(Direction::BOTTOM));
+        $this->assertTrue($c->hasWallAt(Direction::LEFT));
+
+        $c = new Cell(0, 0, false);
+        $this->assertFalse($c->hasWallAt(Direction::TOP));
+        $this->assertFalse($c->hasWallAt(Direction::RIGHT));
+        $this->assertFalse($c->hasWallAt(Direction::BOTTOM));
+        $this->assertFalse($c->hasWallAt(Direction::LEFT));
+    }
 }

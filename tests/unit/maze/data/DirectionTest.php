@@ -30,6 +30,26 @@ class DirectionTest extends BaseTestCase
         );
     }
 
+    public function testPrev()
+    {
+        $this->assertEquals(
+            Direction::LEFT,
+            Direction::prev(Direction::TOP)
+        );
+        $this->assertEquals(
+            Direction::TOP,
+            Direction::prev(Direction::RIGHT)
+        );
+        $this->assertEquals(
+            Direction::RIGHT,
+            Direction::prev(Direction::BOTTOM)
+        );
+        $this->assertEquals(
+            Direction::BOTTOM,
+            Direction::prev(Direction::LEFT)
+        );
+    }
+
     public function testNext()
     {
         $this->assertEquals(
