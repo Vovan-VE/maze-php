@@ -1,10 +1,10 @@
 <?php
 
-namespace VovanVE\MazeProject\tests\unit\maze\export;
+namespace VovanVE\MazeProject\tests\unit\maze\export\text;
 
 use VovanVE\MazeProject\maze\data\Direction;
 use VovanVE\MazeProject\maze\data\Maze;
-use VovanVE\MazeProject\maze\export\TextExporter;
+use VovanVE\MazeProject\maze\export\text\TextExporter;
 use VovanVE\MazeProject\tests\helpers\BaseTestCase;
 
 class TextExporterTest extends BaseTestCase

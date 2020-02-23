@@ -2,9 +2,9 @@
 
 namespace VovanVE\MazeProject\maze;
 
-use VovanVE\MazeProject\maze\export\JsonExporter;
+use VovanVE\MazeProject\maze\export\json\JsonExporter;
 use VovanVE\MazeProject\maze\export\MazeExporterInterface;
-use VovanVE\MazeProject\maze\export\TextExporter;
+use VovanVE\MazeProject\maze\export\text\TextExporter;
 
 class Exporters
 {

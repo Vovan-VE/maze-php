@@ -1,10 +1,10 @@
 <?php
 
-namespace VovanVE\MazeProject\tests\unit\maze\export;
+namespace VovanVE\MazeProject\tests\unit\maze\export\json;
 
 use VovanVE\MazeProject\maze\data\Direction;
 use VovanVE\MazeProject\maze\data\Maze;
-use VovanVE\MazeProject\maze\export\JsonExporter;
+use VovanVE\MazeProject\maze\export\json\JsonExporter;
 use VovanVE\MazeProject\tests\helpers\BaseTestCase;
 
 class JsonExporterTest extends BaseTestCase
