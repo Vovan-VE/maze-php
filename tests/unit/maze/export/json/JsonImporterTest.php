@@ -94,13 +94,15 @@ class JsonImporterTest extends BaseTestCase
         return [
             ['Fail', 'Invalid JSON'],
             ['{', 'Invalid JSON'],
-            ['null', 'Invalid JSON'],
+            ['nullbug', 'Invalid JSON'],
+            ['null bug', 'Invalid JSON'],
 
             ['42', 'Invalid JSON data - not an object'],
             ['"string"', 'Invalid JSON data - not an object'],
             ['true', 'Invalid JSON data - not an object'],
             ['false', 'Invalid JSON data - not an object'],
             ['null', 'Invalid JSON data - not an object'],
+            [' null ', 'Invalid JSON data - not an object'],
 
             // width
             ['{}', 'The field `width` did not set'],

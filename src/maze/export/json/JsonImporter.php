@@ -63,7 +63,7 @@ class JsonImporter implements MazeImporterInterface
     {
         // REFACT: PHP >= 7.3: JSON_THROW_ON_ERROR
         $data = \json_decode($input, true);
-        if (null === $data && !\preg_match('/^\\s*null\\s*/uD', $input)) {
+        if (null === $data && !\preg_match('/^\\s*null\\s*$/uD', $input)) {
             throw new \InvalidArgumentException('Invalid JSON');
         }
         if (!is_array($data)) {

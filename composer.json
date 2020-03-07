@@ -10,6 +10,9 @@
       "email": "vovan-ve@yandex.ru"
     }
   ],
+  "scripts": {
+    "test": "vendor/bin/phpunit"
+  },
   "minimum-stability": "stable",
   "require": {
     "php": "^7.2",
