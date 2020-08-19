@@ -27,7 +27,7 @@ class GenerateCommand extends BaseCommand
                 'H|height:',
                 's|size:',
                 'B|branch-length:',
-                'F|format:',
+                'f|format:',
                 'c:' => OptionsHandlers::getMapper(),
             ]
         ))

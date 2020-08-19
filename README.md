@@ -17,6 +17,7 @@ $ git clone <repo-url>
 $ cd <dir>
 $ composer install
 $ ./maze
+$ ./maze gen -s19x11 -ftext -cwall=▒▒ -cin=in -cout=ex
 ```
 
 [the-maze-project]: https://github.com/Vovan-VE/maze--main
