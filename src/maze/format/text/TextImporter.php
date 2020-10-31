@@ -1,10 +1,10 @@
 <?php
 
-namespace VovanVE\MazeProject\maze\export\text;
+namespace VovanVE\MazeProject\maze\format\text;
 
 use VovanVE\MazeProject\maze\data\Direction;
 use VovanVE\MazeProject\maze\data\Maze;
-use VovanVE\MazeProject\maze\export\MazeImporterInterface;
+use VovanVE\MazeProject\maze\format\MazeImporterInterface;
 
 class TextImporter extends TextBaseConfig implements MazeImporterInterface
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace VovanVE\MazeProject\maze\export\text;
+namespace VovanVE\MazeProject\maze\format\text;
 
 class TextBaseConfig
 {

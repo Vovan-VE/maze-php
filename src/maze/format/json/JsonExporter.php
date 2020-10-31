@@ -1,11 +1,11 @@
 <?php
 
-namespace VovanVE\MazeProject\maze\export\json;
+namespace VovanVE\MazeProject\maze\format\json;
 
 use VovanVE\MazeProject\maze\data\Direction;
 use VovanVE\MazeProject\maze\data\DoorPosition;
 use VovanVE\MazeProject\maze\data\Maze;
-use VovanVE\MazeProject\maze\export\MazeExporterInterface;
+use VovanVE\MazeProject\maze\format\MazeExporterInterface;
 
 class JsonExporter implements MazeExporterInterface
 {

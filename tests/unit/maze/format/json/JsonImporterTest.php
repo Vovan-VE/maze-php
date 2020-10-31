@@ -1,11 +1,11 @@
 <?php
 
-namespace VovanVE\MazeProject\tests\unit\maze\export\json;
+namespace VovanVE\MazeProject\tests\unit\maze\format\json;
 
 use VovanVE\MazeProject\maze\Config;
 use VovanVE\MazeProject\maze\data\Maze;
-use VovanVE\MazeProject\maze\export\json\JsonExporter;
-use VovanVE\MazeProject\maze\export\json\JsonImporter;
+use VovanVE\MazeProject\maze\format\json\JsonExporter;
+use VovanVE\MazeProject\maze\format\json\JsonImporter;
 use VovanVE\MazeProject\maze\Generator;
 use VovanVE\MazeProject\tests\helpers\BaseTestCase;
 

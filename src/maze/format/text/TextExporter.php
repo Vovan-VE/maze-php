@@ -1,11 +1,11 @@
 <?php
 
-namespace VovanVE\MazeProject\maze\export\text;
+namespace VovanVE\MazeProject\maze\format\text;
 
 use VovanVE\MazeProject\maze\data\Direction;
 use VovanVE\MazeProject\maze\data\DoorPosition;
 use VovanVE\MazeProject\maze\data\Maze;
-use VovanVE\MazeProject\maze\export\MazeExporterInterface;
+use VovanVE\MazeProject\maze\format\MazeExporterInterface;
 
 class TextExporter extends TextBaseConfig implements MazeExporterInterface
 {

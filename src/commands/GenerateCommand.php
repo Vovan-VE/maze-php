@@ -8,8 +8,8 @@ use VovanVE\MazeProject\cli\getopt\Options;
 use VovanVE\MazeProject\cli\getopt\OptionsHandlers;
 use VovanVE\MazeProject\cli\getopt\OptionsParser;
 use VovanVE\MazeProject\maze\Config;
-use VovanVE\MazeProject\maze\export\MazeExporterInterface;
-use VovanVE\MazeProject\maze\Exporters;
+use VovanVE\MazeProject\maze\format\MazeExporterInterface;
+use VovanVE\MazeProject\maze\Formats;
 use VovanVE\MazeProject\maze\Generator;
 
 class GenerateCommand extends BaseCommand
@@ -17,7 +17,7 @@ class GenerateCommand extends BaseCommand
     private const DEF_WIDTH = 30;
     private const DEF_HEIGHT = 10;
     private const DEF_BRANCH_LENGTH = 10;
-    private const DEF_FORMAT = Exporters::F_TEXT;
+    private const DEF_FORMAT = Formats::F_TEXT;
 
     public function run(array $args): int
     {
@@ -39,7 +39,7 @@ class GenerateCommand extends BaseCommand
             return 2;
         }
 
-        $exporter = Exporters::getExporter($config->getFormat());
+        $exporter = Formats::getExporter($config->getFormat());
         $this->configureExporter($exporter, $opts);
 
         $maze = (new Generator($config))->generate();
@@ -157,7 +157,7 @@ _END;
 
         if ($opts->hasOpt('F')) {
             $formatStr = $opts->getOpt('F');
-            if (!Exporters::hasFormat($formatStr)) {
+            if (!Formats::hasExporter($formatStr)) {
                 $error = "E: unknown format name in `-F` (`--format`)";
                 return null;
             }

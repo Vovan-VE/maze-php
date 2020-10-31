@@ -4,7 +4,7 @@ namespace VovanVE\MazeProject\tests\unit\maze;
 
 use VovanVE\MazeProject\maze\data\Direction;
 use VovanVE\MazeProject\maze\data\Maze;
-use VovanVE\MazeProject\maze\export\text\TextExporter;
+use VovanVE\MazeProject\maze\format\text\TextExporter;
 use VovanVE\MazeProject\tests\helpers\BaseTestCase;
 use VovanVE\MazeProject\tests\helpers\TracingWalker;
 
