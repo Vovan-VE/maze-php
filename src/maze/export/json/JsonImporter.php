@@ -8,6 +8,13 @@ use VovanVE\MazeProject\maze\export\MazeImporterInterface;
 
 class JsonImporter implements MazeImporterInterface
 {
+    public function configureImport(array $options): void
+    {
+        foreach ($options as $name => $value) {
+            throw new \InvalidArgumentException("Unknown option `$name`");
+        }
+    }
+
     public function importMaze(string $input): Maze
     {
         [

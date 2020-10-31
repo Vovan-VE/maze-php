@@ -2,9 +2,11 @@
 
 namespace VovanVE\MazeProject\tests\unit\maze\export\json;
 
+use VovanVE\MazeProject\maze\Config;
 use VovanVE\MazeProject\maze\data\Maze;
 use VovanVE\MazeProject\maze\export\json\JsonExporter;
 use VovanVE\MazeProject\maze\export\json\JsonImporter;
+use VovanVE\MazeProject\maze\Generator;
 use VovanVE\MazeProject\tests\helpers\BaseTestCase;
 
 class JsonImporterTest extends BaseTestCase
@@ -350,5 +352,16 @@ class JsonImporterTest extends BaseTestCase
                 ' digits, and the last digit can be only `0`',
             ],
         ];
+    }
+
+    public function testRandomReimport()
+    {
+        $maze = (new Generator(new Config(30, 20, 5, '')))->generate();
+
+        $text = (new JsonExporter())->exportMaze($maze);
+
+        $importedMaze = (new JsonImporter())->importMaze($text);
+
+        $this->assertEquals($maze, $importedMaze, 'Imported maze must be equal');
     }
 }
